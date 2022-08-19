@@ -1,0 +1,820 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:pointer_teachers_v2/Storage/StorageStructure/ChildRank.dart';
+import 'package:pointer_teachers_v2/Storage/StorageStructure/GradeList.dart';
+import 'package:pointer_teachers_v2/Storage/StorageStructure/Section.dart';
+import 'package:pointer_teachers_v2/Storage/StorageStructure/SectionList.dart';
+import 'package:pointer_teachers_v2/Storage/StorageStructure/Student.dart';
+import 'package:pointer_teachers_v2/Storage/StorageStructure/StudentList.dart';
+import 'package:pointer_teachers_v2/Storage/StorageStructure/SubjectGroup.dart';
+import 'package:pointer_teachers_v2/Storage/StorageStructure/SubjectGroupList.dart';
+
+import 'StorageStructure/Grade.dart';
+import 'StorageStructure/School.dart';
+import 'StorageStructure/SchoolBoard.dart';
+import 'StorageStructure/StudentRank.dart';
+import 'StorageStructure/Teacher.dart';
+import 'StorageStructure/TeachersList.dart';
+
+class CloudFirestoreControl {
+  FirebaseFirestore db = FirebaseFirestore.instance;
+
+  //region Keys
+  static const String keyFullName = "Full Name";
+  static const String keyScreenName = "Screen Name";
+  static const String keyPhoneNumber = "Phone Number";
+  static const String keyAge = "Age";
+  static const String keyStudentRanks = "Student Rank";
+  static const String keyHomeRanks = "Rank";
+  static const String keyTeacherID = "Teacher ID";
+  static const String keyParentID = "Parent ID";
+  static const String keySchoolID = "School ID";
+  static const String keyIsStudent = "Is a Student?";
+  static const String keySchoolPoints = "School Points";
+  static const String keyHomePoints = "Home Points";
+  static const String keyPin = "Parent Pin";
+  static const String keyReason = "Reason";
+  static const String keyValue = "Value";
+  static const String keyTimestamp = "Timestamp";
+  static const String keyAskParentPin = "Ask Parent Pin";
+  static const String keyTeacherRef = "Teacher Reference";
+  static const String keySchoolRef = "School Reference";
+
+  //region School Data Keys
+  static const String keySchoolBoard = "Board";
+  static const String keySchoolName = "Name";
+  static const String keyTeacherPin = "Teacher Pin";
+
+  //KEY_SCHOOL_ID line 14
+  //endregion
+
+  static const String keySubjectGroup = "Subject Group";
+
+  //region Grade Data Keys
+  static const String keyGrade = "Grade";
+
+  //endregion
+
+  //region Section Data Keys
+  static const String keyClassGrade = "Grade";
+  static const String keyHRClass = "Homeroom Class";
+  static const String keyClassSection = "Section";
+  static const String keyHRTID = "Homeroom Teacher ID";
+  static const String keySectionRef = "Section Reference";
+
+  //endregion
+
+  //region Subject Group Data Keys
+  //KEY_SCHOOL_ID at line 11
+  static const String keyTeacher = "Teacher ID";
+  static const String keySubjectName = "Subject Name";
+  static const String keyStudentID = "Student ID";
+  static const String keyStudentRef = "Student Ref";
+
+  //KEY_HRT_ID at line26
+  static const String keyClassGradeRef = "Class Grade Reference";
+  static const String keyClassSectionRef = "Class Section Reference";
+
+  //endregion
+  //endregion
+
+  void setSchool(School toSave) {
+    String? schoolID = toSave.schoolID;
+    print("Setting school $schoolID");
+    DocumentReference docRef = db
+        .collection("Schools")
+        .doc(toSave.schoolID)
+        .withConverter<School>(
+            fromFirestore: School.fromFirestore,
+            toFirestore: (school, _) => school.toFirestore());
+    docRef.set(toSave);
+    if (toSave.grades != null) {
+      GradeList grades = toSave.grades as GradeList;
+      setGradeList(grades);
+    }
+    if (toSave.students != null) {
+      StudentList students = toSave.students as StudentList;
+      setStudentList(students);
+    }
+    if (toSave.teachers != null) {
+      TeachersList teachers = toSave.teachers as TeachersList;
+      setTeacherList(teachers);
+    }
+  }
+
+  void updateSchool(String schoolID, School original,
+      {SchoolBoard? schoolBoard, String? schoolName}) {
+    if (schoolID == original.schoolID)
+      db.collection("Schools").doc(schoolID).update(
+          School.withOutLists(schoolBoard, schoolName, schoolID).toFirestore());
+    else {
+      db.collection("Schools").doc(original.schoolID).delete();
+      db
+          .collection("Schools")
+          .doc(schoolID)
+          .withConverter<School>(
+              fromFirestore: School.fromFirestore,
+              toFirestore: (school, _) => school.toFirestore())
+          .set(School.withOutLists(schoolBoard, schoolName, schoolID));
+    }
+  }
+
+  Future<School?> getSchool(String schoolID) async {
+    DocumentReference<School> _docRef = db
+        .collection("Schools")
+        .doc(schoolID)
+        .withConverter<School>(
+            fromFirestore: School.fromFirestore,
+            toFirestore: (school, _) => school.toFirestore());
+    DocumentSnapshot<School?> snap = await _docRef.get();
+    School? got = snap.data();
+    got?.students = await getStudentList(schoolID);
+    got?.teachers = await getTeacherList(schoolID);
+    got?.grades = await getGradelist(schoolID);
+    return got;
+  }
+
+  void setStudentList(StudentList toSave) {
+    int length = toSave.studentList.length;
+    print("Saving students list length $length");
+    List<Student> list = toSave.studentList as List<Student>;
+    for (final e in list) {
+      setStudent(e);
+    }
+  }
+
+  Future<StudentList?> getStudentList(String SchoolID) async {
+    CollectionReference _collectionRef =
+        db.collection("Schools").doc(SchoolID).collection("Students");
+    QuerySnapshot querySnapshot = await _collectionRef.get();
+    StudentList list = StudentList.empty();
+    final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+    for (final e in allData) {
+      Map<String, dynamic> data = e as Map<String, dynamic>;
+      list.studentList.add(Student.fromMap(data));
+    }
+    return list;
+  }
+
+  void setStudent(Student toSave) {
+    String? schoolID = toSave.schoolID;
+    String? fullName = toSave.fullName;
+    print("Saving student $schoolID $fullName");
+    DocumentReference docRef = db
+        .collection("Schools")
+        .doc(toSave.schoolID)
+        .collection("Students")
+        .doc(toSave.fullName)
+        .withConverter<Student>(
+            fromFirestore: Student.fromFirestore,
+            toFirestore: (student, _) => student.toFirestore());
+    docRef.set(toSave);
+  }
+
+  void updateStudent(String schoolID, String fullName, Student original,
+      {String? screenName,
+      phoneNo,
+      teachersID,
+      parentsID,
+      schoolRef,
+      teacherRef,
+      int? age,
+      HomePoints,
+      schoolPoints,
+      ChildRank? rank,
+      StudentRank? studentRank}) {
+    if (schoolID == original.schoolID && fullName == original.fullName) {
+      print("Updating student $schoolID $fullName");
+      db
+          .collection("Schools")
+          .doc(schoolID)
+          .collection("Students")
+          .doc(fullName)
+          .withConverter<Student>(
+              fromFirestore: Student.fromFirestore,
+              toFirestore: (student, _) => student.toFirestore())
+          .update(Student.withOutLists(
+                  fullName,
+                  screenName,
+                  phoneNo,
+                  age,
+                  teachersID,
+                  parentsID,
+                  schoolID,
+                  rank,
+                  grade,
+                  HomePoints,
+                  schoolPoints,
+                  schoolRef,
+                  teacherRef,
+                  studentRank)
+              .toFirestore());
+    } else {
+      print("Updating student $schoolID $fullName");
+      db
+          .collection("Schools")
+          .doc(original.schoolID)
+          .collection("Students")
+          .doc(original.fullName)
+          .withConverter<Student>(
+              fromFirestore: Student.fromFirestore,
+              toFirestore: (student, _) => student.toFirestore())
+          .delete();
+      db
+          .collection("Schools")
+          .doc(schoolID)
+          .collection("Students")
+          .doc(fullName)
+          .withConverter<Student>(
+              fromFirestore: Student.fromFirestore,
+              toFirestore: (student, _) => student.toFirestore())
+          .set(Student.withOutLists(
+              fullName,
+              screenName,
+              phoneNo,
+              age,
+              teachersID,
+              parentsID,
+              schoolID,
+              rank,
+              HomePoints,
+              schoolPoints,
+              schoolRef,
+              teacherRef,
+              studentRank));
+    }
+  }
+
+  Future<Student?> getStudent(String SchoolID, String fullName) async {
+    DocumentReference<Student> _docRef = db
+        .collection("Schools")
+        .doc(SchoolID)
+        .collection("Students")
+        .doc(fullName)
+        .withConverter<Student>(
+            fromFirestore: Student.fromFirestore,
+            toFirestore: (student, _) => student.toFirestore());
+    DocumentSnapshot<Student?> snap = await _docRef.get();
+    return snap.data();
+  }
+
+  Future<Student?> getStudentWithRef(String ref) async {
+    DocumentReference<Student> _docRef = db.doc(ref).withConverter<Student>(
+        fromFirestore: Student.fromFirestore,
+        toFirestore: (student, _) => student.toFirestore());
+    DocumentSnapshot<Student?> snap = await _docRef.get();
+    return snap.data();
+  }
+
+  void setTeacherList(TeachersList toSave) {
+    int length = toSave.teachersList.length;
+    print("Saving teachers list length $length");
+    List<Teacher> list = toSave.teachersList as List<Teacher>;
+    for (final e in list) {
+      setTeacher(e);
+    }
+  }
+
+  Future<TeachersList> getTeacherList(String schoolID) async {
+    CollectionReference _collectionRef =
+        db.collection("Schools").doc(schoolID).collection("Teachers");
+    QuerySnapshot querySnapshot = await _collectionRef.get();
+    TeachersList list = TeachersList.empty();
+    final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+    for (final e in allData) {
+      Map<String, dynamic> data = e as Map<String, dynamic>;
+      list.teachersList.add(Teacher.fromMap(data));
+    }
+    return list;
+  }
+
+  void setTeacher(Teacher toSave) {
+    String? schoolID = toSave.schoolID;
+    String? phoneNo = toSave.phoneNo;
+    print("Saving teacher $schoolID $phoneNo");
+    DocumentReference docRef = db
+        .collection("Schools")
+        .doc(toSave.schoolID)
+        .collection("Teachers")
+        .doc(toSave.phoneNo)
+        .withConverter<Teacher>(
+            fromFirestore: Teacher.fromFirestore,
+            toFirestore: (teacher, _) => teacher.toFirestore());
+    docRef.set(toSave);
+  }
+
+  void updateTeacher(
+    String schoolID,
+    String phoneNo,
+    Teacher original, {
+    String? fullName,
+    screenName,
+    int? age,
+    Section? HRClass,
+    int? teacherPin,
+  }) {
+    if (schoolID == original.schoolID && phoneNo == original.phoneNo) {
+      Map<String, dynamic> data = Map();
+      if (fullName != null) data[keyFullName] = fullName;
+      if (screenName != null) data[keyScreenName] = screenName;
+      if (age != null) data[keyAge] = age;
+      if (teacherPin != null) data[keyTeacherPin] = teacherPin;
+      data[keySchoolID] = schoolID;
+      data[keyPhoneNumber] = phoneNo;
+      db
+          .collection("Schools")
+          .doc(schoolID)
+          .collection("Teachers")
+          .doc(phoneNo)
+          .update(data);
+    } else {
+      Teacher toSave = Teacher.withOutLists(
+          fullName, screenName, phoneNo, age, HRClass, schoolID, teacherPin);
+      db
+          .collection("Schools")
+          .doc(schoolID)
+          .collection("Teachers")
+          .doc(phoneNo)
+          .delete();
+      setTeacher(toSave);
+    }
+  }
+
+  Future<Teacher?> getTeacher(String schoolID, String phoneNo) async {
+    DocumentReference<Teacher> _docRef = db
+        .collection("Schools")
+        .doc(schoolID)
+        .collection("Teachers")
+        .doc(phoneNo)
+        .withConverter<Teacher>(
+            fromFirestore: Teacher.fromFirestore,
+            toFirestore: (teacher, _) => teacher.toFirestore());
+    DocumentSnapshot<Teacher?> snap = await _docRef.get();
+    Teacher got = snap.data()!;
+    got.classroomList = await getTeacherClassroomList(schoolID, phoneNo);
+    return got;
+  }
+
+  void setTeacherClassroomList(
+      String schoolID, String phoneNo, List<String> classroomList) async {
+    for (String classroom in classroomList) {
+      await db
+          .collection("Schools")
+          .doc(schoolID)
+          .collection("Teachers")
+          .doc(phoneNo)
+          .collection("Classes")
+          .doc("classes")
+          .set({"Classes": classroomList});
+    }
+  }
+
+  Future<List<String>?> getTeacherClassroomList(
+      String schoolID, String phoneNo) async {
+    DocumentSnapshot<Map<String, dynamic>> snap = await db
+        .collection("Schools")
+        .doc(schoolID)
+        .collection("Teachers")
+        .doc(phoneNo)
+        .collection("Classes")
+        .doc("classes")
+        .get();
+    if (snap.data() == null) {
+      return List<String>.empty();
+    }
+    Map<String, dynamic> data = snap.data()!;
+    //return data["Classes"] as List<String>;
+    return (data["Classes"] as List).map((e) => e as String).toList();
+  }
+
+  void setGradeList(GradeList toSave) {
+    List<Grade> list = toSave.gradeList as List<Grade>;
+    for (final e in list) {
+      setGrade(e);
+    }
+  }
+
+  Future<GradeList> getGradelist(String schoolID) async {
+    CollectionReference _collectionRef =
+        db.collection("Schools").doc(schoolID).collection("Grades");
+    QuerySnapshot querySnapshot = await _collectionRef.get();
+    GradeList list = GradeList.empty();
+    final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+    for (final e in allData) {
+      Map<String, dynamic> data = e as Map<String, dynamic>;
+      list.gradeList.add(Grade.fromMap(data));
+    }
+    return list;
+  }
+
+  void setGrade(Grade toSave) {
+    DocumentReference docRef = db
+        .collection("Schools")
+        .doc(toSave.schoolID)
+        .collection("Grades")
+        .doc(toSave.grade.toString())
+        .withConverter<Grade>(
+            fromFirestore: Grade.fromFirestore,
+            toFirestore: (grade, _) => grade.toFirestore());
+    docRef.set(toSave);
+    SectionList list = toSave.sectionList as SectionList;
+    setSectionList(list);
+  }
+
+  void updateGrade(String schoolID, int grade, Grade original) {
+    if (schoolID == original.schoolID && grade == original.grade) {
+      db.collection("Schools")
+          .doc(schoolID)
+          .collection("Grades")
+          .doc(grade.toString())
+          .update(original.toFirestore());
+    } else {
+      Grade toSave = Grade.withOutLists(schoolID, grade);
+      db
+          .collection("Schools")
+          .doc(schoolID)
+          .collection("Grades")
+          .doc(grade.toString())
+          .delete();
+      setGrade(toSave);
+    }
+  }
+
+  Future<Grade?> getGrade(String schoolID, int grade) async {
+    DocumentReference<Grade> _docRef = db
+        .collection("Schools")
+        .doc(schoolID)
+        .collection("Grades")
+        .doc(grade.toString())
+        .withConverter<Grade>(
+            fromFirestore: Grade.fromFirestore,
+            toFirestore: (grade, _) => grade.toFirestore());
+    DocumentSnapshot<Grade?> snap = await _docRef.get();
+    Grade? got = snap.data();
+    got?.sectionList = await getSectionList(schoolID, grade);
+    return got;
+  }
+
+  void setSectionList(SectionList toSave) {
+    List<Section> list = toSave.sectionList as List<Section>;
+    for (final e in list) {
+      setSection(e);
+    }
+  }
+
+  Future<SectionList?> getSectionList(String schoolID, int grade) async {
+    CollectionReference _collectionRef = db
+        .collection("Schools")
+        .doc(schoolID)
+        .collection("Grades")
+        .doc(grade.toString())
+        .collection("Section");
+    QuerySnapshot querySnapshot = await _collectionRef.get();
+    SectionList list = SectionList.empty();
+    final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+    for (final e in allData) {
+      Map<String, dynamic> data = e as Map<String, dynamic>;
+      list.sectionList.add(Section.fromMap(data));
+    }
+    return list;
+  }
+
+  void setSection(Section toSave) {
+    DocumentReference docRef = db
+        .collection("Schools")
+        .doc(toSave.schoolID)
+        .collection("Grades")
+        .doc(toSave.classGrade.toString())
+        .collection("Section")
+        .doc(toSave.classSection)
+        .withConverter<Section>(
+            fromFirestore: Section.fromFirestore,
+            toFirestore: (section, _) => section.toFirestore());
+    docRef.set(toSave);
+    if (toSave.subjectGroupList != null)
+      setSubjectGroupList(toSave.subjectGroupList as SubjectGroupList);
+  }
+
+  void updateSection(
+      String schoolID, int classGrade, String classSection, Section original,
+      {String? HRTID}) {
+    if (schoolID != original.schoolID ||
+        classGrade != original.classGrade ||
+        classSection != original.classSection) {
+      db
+          .collection("Schools")
+          .doc(original.schoolID)
+          .collection("Grades")
+          .doc(original.classGrade.toString())
+          .collection("Section")
+          .doc(original.classSection)
+          .delete();
+      setSection(
+          Section.withOutLists(schoolID, classGrade, classSection, HRTID));
+    } else {
+      Map<String, dynamic> data = Map();
+      if (HRTID != null) data[keyHRTID] = HRTID;
+      data[keySchoolID] = schoolID;
+      data[keyClassGrade] = classGrade;
+      data[keyClassSection] = classSection;
+      db
+          .collection("Schools")
+          .doc(schoolID)
+          .collection("Grades")
+          .doc(classGrade.toString())
+          .collection("Section")
+          .doc(classSection)
+          .withConverter<Section>(
+              fromFirestore: Section.fromFirestore,
+              toFirestore: (section, _) => section.toFirestore())
+          .update(data);
+    }
+  }
+
+  Future<Section?> getSection(
+      String schoolID, int grade, String section) async {
+    DocumentReference<Section> _docRef = db
+        .collection("Schools")
+        .doc(schoolID)
+        .collection("Grades")
+        .doc(grade.toString())
+        .collection("Section")
+        .doc(section)
+        .withConverter<Section>(
+            fromFirestore: Section.fromFirestore,
+            toFirestore: (section, _) => section.toFirestore());
+    DocumentSnapshot<Section?> snap = await _docRef.get();
+    Section? got = snap.data();
+    got?.subjectGroupList = await getSubjectGroupList(schoolID, grade, section);
+    return got;
+  }
+
+  Future<Section> getSectionFromRef(String ref) async {
+    DocumentReference<Section> _docRef = db.doc(ref).withConverter<Section>(
+        fromFirestore: Section.fromFirestore,
+        toFirestore: (section, _) => section.toFirestore());
+    DocumentSnapshot<Section?> snap = await _docRef.get();
+    Section? got = snap.data();
+    got?.subjectGroupList =
+        await getSubjectGroupListRef(ref + "/Subject Groups");
+    return got!;
+  }
+
+  void setSubjectGroupList(SubjectGroupList toSave) {
+    List<SubjectGroup>? list = toSave.subjectGroupList;
+    for (final l in list) {
+      setSubjectGroup(l);
+    }
+  }
+
+  Future<SubjectGroupList> getSubjectGroupList(
+      String schoolID, int grade, String section) async {
+    CollectionReference _collectionRef = db
+        .collection("Schools")
+        .doc(schoolID)
+        .collection("Grades")
+        .doc(grade.toString())
+        .collection("Section")
+        .doc(section)
+        .collection("Subject Groups");
+    QuerySnapshot querySnapshot = await _collectionRef.get();
+    SubjectGroupList list = SubjectGroupList.empty();
+    final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+    for (final o in allData) {
+      Map<String, dynamic> data = o as Map<String, dynamic>;
+      SubjectGroup got = SubjectGroup.fromMap(data);
+      list.subjectGroupList.add(got);
+      print(got.schoolID);
+      print(got.HRTID);
+      print(got.classSectionRef);
+      print(got.classGradeRef);
+      print(got.subject);
+      print(got.teacherID);
+    }
+    return list;
+  }
+
+  Future<SubjectGroupList> getSubjectGroupListRef(String ref) async {
+    SubjectGroupList list = SubjectGroupList.empty();
+    QuerySnapshot querySnapshot = await db.collection(ref).get();
+    querySnapshot.docs.map((doc) => doc.data()).toList().forEach((element) {
+      Map<String, dynamic> data = element as Map<String, dynamic>;
+      SubjectGroup got = SubjectGroup.fromMap(data);
+      list.subjectGroupList.add(got);
+    });
+    return list;
+  }
+
+  void setSubjectGroup(SubjectGroup toSave) {
+    DocumentReference docRef = db
+        .collection("Schools")
+        .doc(toSave.schoolID)
+        .collection("Grades")
+        .doc(toSave.classGradeRef.toString())
+        .collection("Section")
+        .doc(toSave.classSectionRef)
+        .collection("Subject Groups")
+        .doc(toSave.subject)
+        .withConverter<SubjectGroup>(
+            fromFirestore: SubjectGroup.fromFirestore,
+            toFirestore: (subjectGroup, _) => subjectGroup.toFirestore());
+    print(docRef.toString());
+
+    docRef.set(toSave);
+    if (toSave.students != null) {
+      StudentList list = toSave.students as StudentList;
+      setStudentRefList(list, toSave);
+    }
+  }
+
+  void updateSubjectGroup(String schoolID, int classGradeRef,
+      String classSectionRef, String subject, SubjectGroup original,
+      {String? teacherID, String? HRTID}) {
+    if (schoolID != original.schoolID ||
+        classGradeRef != original.classGradeRef ||
+        classSectionRef != original.classSectionRef ||
+        subject != original.subject) {
+      DocumentReference<SubjectGroup> docRef = db
+          .collection("Schools")
+          .doc(original.schoolID)
+          .collection("Grades")
+          .doc(original.classGradeRef.toString())
+          .collection("Section")
+          .doc(original.classSectionRef)
+          .collection("Subject Groups")
+          .doc(original.subject)
+          .withConverter<SubjectGroup>(
+              fromFirestore: SubjectGroup.fromFirestore,
+              toFirestore: (subjectGroup, _) => subjectGroup.toFirestore());
+      docRef.delete();
+      setSubjectGroup(SubjectGroup.withOutLists(
+          schoolID, teacherID, subject, HRTID, classGradeRef, classSectionRef));
+    } else {
+      Map<String, dynamic> data = Map();
+      if (teacherID != null) data[keyTeacherID] = teacherID;
+      if (HRTID != null) data[keyHRTID] = HRTID;
+      data[keySchoolID] = schoolID;
+      data[keyClassGradeRef] = classGradeRef;
+      data[keyClassSectionRef] = classSectionRef;
+      data[keySubjectName] = subject;
+      db
+          .collection("Schools")
+          .doc(schoolID)
+          .collection("Grades")
+          .doc(classGradeRef.toString())
+          .collection("Section")
+          .doc(classSectionRef)
+          .collection("Subject Groups")
+          .doc(subject)
+          .update(data);
+    }
+  }
+
+  Future<SubjectGroup?> getSubjectGroup(
+      String schoolID, int grade, String section, String subject) async {
+    DocumentReference<SubjectGroup> docRef = db
+        .collection("Schools")
+        .doc(schoolID)
+        .collection("Grades")
+        .doc(grade.toString())
+        .collection("Section")
+        .doc(section)
+        .collection("Subject Groups")
+        .doc(subject)
+        .withConverter<SubjectGroup>(
+            fromFirestore: SubjectGroup.fromFirestore,
+            toFirestore: (subjectGroup, _) => subjectGroup.toFirestore());
+    DocumentSnapshot<SubjectGroup?> snap = await docRef.get();
+    return snap.data();
+  }
+
+  void setStudentRefList(StudentList toSave, SubjectGroup ref) {
+    List<Student> list = toSave.studentList as List<Student>;
+    for (final e in list) {
+      setStudentRef(e.screenName!, e.schoolID!, e.fullName!, ref);
+    }
+  }
+
+  Future<StudentList> getStudentRefList(
+      String schoolID, int grade, String section, String subject) async {
+    CollectionReference _collectionRef = db
+        .collection("Schools")
+        .doc(schoolID)
+        .collection("Grades")
+        .doc(grade.toString())
+        .collection("Section")
+        .doc(section)
+        .collection("Subject Groups")
+        .doc(subject)
+        .collection("Students");
+    QuerySnapshot querySnapshot = await _collectionRef.get();
+    StudentList list = StudentList.empty();
+    final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+    for (final o in allData) {
+      Map<String, dynamic> data = o as Map<String, dynamic>;
+      String ref = data[keyStudentRef];
+      Student? got = await getStudentWithRef(ref);
+      list.studentList.add(got!);
+    }
+    return list;
+  }
+
+  void setStudentRef(
+      String screenName, String schoolID, String fullName, SubjectGroup ref) {
+    DocumentReference docRef = db
+        .collection("Schools")
+        .doc(ref.schoolID)
+        .collection("Grades")
+        .doc(ref.classGradeRef.toString())
+        .collection("Section")
+        .doc(ref.classSectionRef)
+        .collection("Subject Groups")
+        .doc(ref.subject)
+        .collection("Students")
+        .doc(screenName);
+    docRef
+        .set({keyStudentRef: "/Schools/" + schoolID + "/Students/" + fullName});
+  }
+
+  void updateStudentRef(
+      String screenName, String schoolID, String fullName, SubjectGroup ref) {
+    DocumentReference docRef = db
+        .collection("Schools")
+        .doc(ref.schoolID)
+        .collection("Grades")
+        .doc(ref.classGradeRef.toString())
+        .collection("Section")
+        .doc(ref.classSectionRef)
+        .collection("Subject Groups")
+        .doc(ref.subject)
+        .collection("Students")
+        .doc(screenName);
+    docRef.update(
+        {keyStudentRef: "/Schools/" + schoolID + "/Students/" + fullName});
+  }
+
+  Future<String> getStudentRef(String schoolID, int grade, String section,
+      String subject, String screenName) async {
+    DocumentReference _docRef = db
+        .collection("Schools")
+        .doc(schoolID)
+        .collection("Grades")
+        .doc(grade.toString())
+        .collection("Section")
+        .doc(section)
+        .collection("Subject Groups")
+        .doc(subject)
+        .collection("Students")
+        .doc(screenName);
+    DocumentSnapshot doc = await _docRef.get();
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return data[keyStudentRef];
+  }
+
+  Future<void> deleteDocRef(String ref) async {
+    await db.doc(ref).delete();
+  }
+
+  static SchoolBoard stringToSchoolBoard(String schoolBoard) {
+    List<SchoolBoard> data = SchoolBoard.values;
+    for (final e in data) {
+      if (e.toString() == schoolBoard) {
+        return e;
+      }
+    }
+    return SchoolBoard.NONE;
+  }
+
+  static ChildRank stringToChildRank(String childRank) {
+    List<ChildRank> data = ChildRank.values;
+    for (final e in data) {
+      if (e.toString() == childRank) {
+        return e;
+      }
+    }
+    return ChildRank.NONE;
+  }
+
+  static StudentRank stringToStudentRank(String studentRank) {
+    List<StudentRank> data = StudentRank.values;
+    for (final e in data) {
+      if (e.toString() == studentRank) {
+        return e;
+      }
+    }
+    return StudentRank.NONE;
+  }
+
+  void getPhoneNo() {}
+
+  Future<bool> checkIfDocumentExists(String path) async {
+    try {
+      DocumentSnapshot snap = await db.doc(path).get();
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "696596299791",
+    "project_id": "pointer-teachers",
+    "storage_bucket": "pointer-teachers.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:696596299791:android:876100b7d958324d31237a",
+        "android_client_info": {
+          "package_name": "com.aadi.flutter.pointer_teachers_v2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "696596299791-alt408dif151f3e32ueqm68daochufst.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCf47Oz8uoo3wFXQnktmr54NQmK26MZPg8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "696596299791-alt408dif151f3e32ueqm68daochufst.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "696596299791-84v4221slo0j8kmcsdr3bokobdbcun0s.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pointerTeachers"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:696596299791:android:ba09417d129b21d531237a",
+        "android_client_info": {
+          "package_name": "com.aadi.pointer_teachers_2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "696596299791-alt408dif151f3e32ueqm68daochufst.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCf47Oz8uoo3wFXQnktmr54NQmK26MZPg8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "696596299791-alt408dif151f3e32ueqm68daochufst.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "696596299791-84v4221slo0j8kmcsdr3bokobdbcun0s.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pointerTeachers"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
