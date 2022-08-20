@@ -161,6 +161,5 @@ class _SignInOrRegisterState extends State<SignInOrRegister> {
     GlobalVariables.signInOption = SignInOptions.Phone;
     //Navigator.push(context, MaterialPageRoute(builder: (context) => PhoneSignIn()));
 
-    Navigator.push(context, MaterialPageRoute(builder: (context) => PhoneInputScreen()));
   }
 }

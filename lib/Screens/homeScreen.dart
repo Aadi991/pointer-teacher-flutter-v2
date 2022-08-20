@@ -736,8 +736,8 @@ class _HomeState extends State<Home> {
                                                     context,
                                                     MaterialPageRoute(
                                                       builder: (context) =>
-                                                          SubjectGroupScreen(
-                                                            subjectGroup: subjectGroup,
+                                                          Subjects(
+                                                            clickedSubject: subjectGroup,
                                                             phoneNo: widget.phoneNo,
                                                             schoolID: widget.schoolID,
                                                           ),

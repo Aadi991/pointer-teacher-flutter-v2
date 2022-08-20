@@ -410,8 +410,8 @@ class CloudFirestoreControl {
             fromFirestore: Teacher.fromFirestore,
             toFirestore: (teacher, _) => teacher.toFirestore());
     DocumentSnapshot<Teacher?> snap = await _docRef.get();
-    Teacher got = snap.data()!;
-    got.classroomList = await getTeacherClassroomList(schoolID, phoneNo);
+    Teacher? got = snap.data();
+    got?.classroomList = await getTeacherClassroomList(schoolID, phoneNo);
     return got;
   }
 
@@ -666,15 +666,13 @@ class CloudFirestoreControl {
   }
 
   getSubjectGroupStudentsList(
-      String schoolID, int grade, String section, String subject) async {
+      String schoolID, int grade, String subject) async {
     CollectionReference _collectionRef = db
         .collection("Schools")
         .doc(schoolID)
         .collection("Grades")
         .doc(grade.toString())
-        .collection("Section")
-        .doc(section)
-        .collection("SubjectGroup")
+        .collection("Subject Groups")
         .doc(subject)
         .collection("Students");
     QuerySnapshot querySnapshot = await _collectionRef.get();

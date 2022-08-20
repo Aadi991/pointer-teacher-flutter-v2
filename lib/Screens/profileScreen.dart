@@ -47,106 +47,11 @@ class _ProfileState extends State<Profile> {
     String schoolID = "";
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      if (prefs.containsKey(SharedPrefsKeys.schoolIDKey)) {
-        schoolID = prefs.getString(SharedPrefsKeys.schoolIDKey) ?? "";
-      }
-      else {
-        await showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text("Enter your school name"),
-                content: TextField(
-                  controller: schoolIDController,
-                  decoration: InputDecoration(
-                    labelText: "School Name",
-                  ),
-                ),
-                actions: [
-                  TextButton(
-                    child: Text("Submit"),
-                    onPressed: () {
-                      schoolID = schoolIDController.text;
-                      if (schoolID.isEmpty) {
-                        showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: Text("Error"),
-                                content: Text("Please enter your school name"),
-                                actions: [
-                                  TextButton(
-                                    child: Text("OK"),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                ],
-                              );
-                            });
-                      } else {
-                        prefs.setString(SharedPrefsKeys.schoolIDKey, schoolID);
-                        Navigator.pop(context);
-                      }
-                    },
-                  ),
-                ],
-              );
-            });
-      }
-      if (prefs.containsKey(prefKey)) {
-        String phoneNo = await prefs.getString(prefKey)!;
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return Home(phoneNo: phoneNo, schoolID: schoolID);
-        }));
-      }
-      else{
-        await showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text("Enter your phone number"),
-                content: TextField(
-                  controller: phoneNumberController,
-                  decoration: InputDecoration(
-                    labelText: "Phone Number",
-                  ),
-                ),
-                actions: [
-                  TextButton(
-                    child: Text("Submit"),
-                    onPressed: () {
-                      phoneNo = phoneNumberController.text;
-                      if (phoneNo.isEmpty) {
-                        showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: Text("Error"),
-                                content:
-                                Text("Please enter your phone number"),
-                                actions: [
-                                  TextButton(
-                                    child: Text("OK"),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                ],
-                              );
-                            });
-                      } else {
-                        prefs.setString(
-                            SharedPrefsKeys.phoneNoKey, phoneNo);
-                        Navigator.pop(context);
-                      }
-                    },
-                  ),
-                ],
-              );
-            });
-      }
       if(GlobalVariables.profileFrom == ProfileFrom.Home){
+        schoolID = prefs.get(SharedPrefsKeys.schoolIDKey) as String;
+        phoneNo = prefs.get(prefKey) as String;
+        print(schoolID);
+        print(phoneNo);
         Teacher? current = await control.getTeacher(schoolID, phoneNo);
         fullNameController.text = current!.fullName!;
         screenNameController.text = current.screenName!;
@@ -154,6 +59,65 @@ class _ProfileState extends State<Profile> {
         ageController.text = current.age.toString();
         schoolIDController.text = current.schoolID!;
         teacherPinController.text = current.teacherPin.toString();
+      }else{
+        if (prefs.containsKey(SharedPrefsKeys.schoolIDKey)) {
+          schoolID = prefs.getString(SharedPrefsKeys.schoolIDKey) ?? "";
+        }
+        else {
+          await showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: Text("Enter your school name"),
+                  content: TextField(
+                    controller: schoolIDController,
+                    decoration: InputDecoration(
+                      labelText: "School Name",
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      child: Text("Submit"),
+                      onPressed: () {
+                        schoolID = schoolIDController.text;
+                        if (schoolID.isEmpty) {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text("Error"),
+                                  content: Text("Please enter your school name"),
+                                  actions: [
+                                    TextButton(
+                                      child: Text("OK"),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ],
+                                );
+                              });
+                        } else {
+                          prefs.setString(SharedPrefsKeys.schoolIDKey, schoolID);
+                          Navigator.pop(context);
+                        }
+                      },
+                    ),
+                  ],
+                );
+              });
+        }
+        if (prefs.containsKey(prefKey)) {
+          String phoneNo = await prefs.getString(prefKey)!;
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return Home(phoneNo: phoneNo, schoolID: schoolID);
+          }));
+        }
+        else{
+          User current = FirebaseAuth.instance.currentUser!;
+          prefs.setString(prefKey, current.phoneNumber!);
+          Utils.showSnackBar(context, "The phone number that your account is being created with is ${current.phoneNumber!}");
+        }
       }
     });
   }
@@ -175,7 +139,7 @@ class _ProfileState extends State<Profile> {
     return Scaffold(
       appBar: AppBar(
         title: Center(child: Text('Profile')),
-        automaticallyImplyLeading: true,
+        automaticallyImplyLeading: GlobalVariables.profileFrom == ProfileFrom.Home,
       ),
       body: SingleChildScrollView(
           child: ConstrainedBox(

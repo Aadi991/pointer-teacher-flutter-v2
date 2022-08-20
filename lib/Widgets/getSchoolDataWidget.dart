@@ -136,7 +136,7 @@ class _GetSchoolDataState extends State<GetSchoolData> {
                   } else {
                     CloudFirestoreControl control = CloudFirestoreControl();
                     control.setSchool(School.withOutLists(getSchoolBoard(widget.dropdownValue),
-                        widget.schoolNameController.text, widget.dropdownValue));
+                        widget.schoolNameController.text, widget.schoolIDController.text));
                     Navigator.push(
                         context,
                         MaterialPageRoute(

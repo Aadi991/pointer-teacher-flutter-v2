@@ -4,7 +4,9 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterfire_ui/auth.dart';
 import 'package:pointer_teachers_v2/Colours.dart';
+import 'package:pointer_teachers_v2/Screens/phoneSignInScreen.dart';
 import 'package:pointer_teachers_v2/Storage/cloudFirestoreControl.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:pointer_teachers_v2/Utils.dart';
@@ -31,7 +33,8 @@ class MyApp extends StatelessWidget {
       fontFamily: 'Quicksand',
     );
 
-    return MaterialApp(theme: themeData, title: 'Flutter Demo',home: SplashPage());
+    return MaterialApp(
+        theme: themeData, title: 'Flutter Demo', home: SplashPage());
   }
 }
 
@@ -92,9 +95,8 @@ class _SplashPageState extends State<SplashPage> {
                 builder: (context) => Profile(),
               ),
             )
-          : Navigator.push(context,
-              MaterialPageRoute(builder: (context) => SignInOrRegister()));
-
+          :Navigator.push(context,
+              MaterialPageRoute(builder: (context) => PhoneSignIn()));
     });
   }
 }
