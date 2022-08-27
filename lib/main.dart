@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
@@ -19,6 +20,11 @@ import 'firebase_options.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  FirebaseFirestore.instance.settings  = Settings(
+    host: "10.0.2.2:8080"
+  );
+  FirebaseAuth.instance.useAuthEmulator("10.0.2.", 9099);
   runApp(const MyApp());
 }
 
@@ -47,6 +53,9 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> {
   CloudFirestoreControl? control;
+  String? phoneNumber;
+
+  FirebaseAuth auth = FirebaseAuth.instance;
 
   String random10DigitNumber() {
     String ret = " ";
@@ -95,8 +104,9 @@ class _SplashPageState extends State<SplashPage> {
                 builder: (context) => Profile(),
               ),
             )
-          :Navigator.push(context,
-              MaterialPageRoute(builder: (context) => PhoneSignIn()));
+          : {
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>PhoneSignIn()))
+            };
     });
   }
 }

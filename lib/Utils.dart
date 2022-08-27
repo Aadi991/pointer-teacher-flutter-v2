@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_sms/flutter_sms.dart' as SMS;
 
 import 'Storage/SignInOption.dart';
 
@@ -23,6 +24,14 @@ class Utils {
       ret = ret + Utils.randomRange(1, 9).toString();
     }
     return ret;
+  }
+
+  static void sendSMS(String message, List<String> recipents) async {
+    String _result = await SMS.sendSMS(message: message, recipients: recipents)
+        .catchError((onError) {
+      print(onError);
+    });
+    print(_result);
   }
 }
 

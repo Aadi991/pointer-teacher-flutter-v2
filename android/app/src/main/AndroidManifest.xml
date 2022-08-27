@@ -1,5 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.aadi.flutter.pointer_teachers_v2">
+
+    <uses-permission android:name="android.permission.SEND_SMS"/>
+
    <application
         android:label="pointer_teachers_v2"
         android:name="${applicationName}"
