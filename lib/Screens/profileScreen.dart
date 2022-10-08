@@ -26,7 +26,6 @@ class _ProfileState extends State<Profile> {
   bool _editing = true;
   bool progress = false;
   bool _seeData = false;
-  String prefKey = SharedPrefsKeys.phoneNoKey;
   int userDataStackIndex = 1;
   int collapseStackIndex = 0;
   TextEditingController fullNameController = TextEditingController();
@@ -49,7 +48,6 @@ class _ProfileState extends State<Profile> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       if(GlobalVariables.profileFrom == ProfileFrom.Home){
         schoolID = prefs.get(SharedPrefsKeys.schoolIDKey) as String;
-        phoneNo = prefs.get(prefKey) as String;
         print(schoolID);
         print(phoneNo);
         Teacher? current = await control.getTeacher(schoolID, phoneNo);
@@ -107,31 +105,14 @@ class _ProfileState extends State<Profile> {
                 );
               });
         }
-        if (prefs.containsKey(prefKey)) {
-          String phoneNo = await prefs.getString(prefKey)!;
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return Home(phoneNo: phoneNo, schoolID: schoolID);
-          }));
-        }
-        else{
-          User current = FirebaseAuth.instance.currentUser!;
-          prefs.setString(prefKey, current.phoneNumber!);
-          Utils.showSnackBar(context, "The phone number that your account is being created with is ${current.phoneNumber!}");
+        if(GlobalVariables.setPhoneNo){
+          phoneNo = "+919880721381";
+          phoneNumberController.text = "+919880721381";
         }
       }
     });
   }
 
-  void setPhoneNo(String phoneNo) async {
-    setState(() {
-      progress = true;
-    });
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString(prefKey, phoneNo);
-    setState(() {
-      progress = false;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -427,11 +408,6 @@ class _ProfileState extends State<Profile> {
                                             schoolIDController.text,
                                             int.tryParse(
                                                 teacherPinController.text)));
-                                        SharedPreferences prefs =
-                                            await SharedPreferences
-                                                .getInstance();
-                                        await prefs.setString(prefKey,
-                                            phoneNumberController.text);
                                         //? //print("true")
                                         //: //print("false");
                                         Navigator.push(

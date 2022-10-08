@@ -4,14 +4,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:pointer_teachers_v2/Screens/phoneSignInScreen.dart';
 import 'package:pointer_teachers_v2/Screens/profileScreen.dart';
 import 'package:pointer_teachers_v2/Widgets/registerWidget.dart';
 import 'package:pointer_teachers_v2/Widgets/signInWidget.dart';
 
-import '../Colours.dart';
-import '../Storage/SignInOption.dart';
-import '../Utils.dart';
+import '../../Colours.dart';
+import '../../Storage/SignInOption.dart';
+import '../../Utils.dart';
 
 
 

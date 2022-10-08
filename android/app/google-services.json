@@ -7,9 +7,97 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:696596299791:android:32064ad2828d87d831237a",
+        "android_client_info": {
+          "package_name": "com.aadi.firebase_phone_auth"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "696596299791-qpk8njmhs4e9fsqsrhlum0nai0c5qhe6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aadi.firebase_phone_auth",
+            "certificate_hash": "4693db9233267b1a9ad294c5522185415f6d398f"
+          }
+        },
+        {
+          "client_id": "696596299791-alt408dif151f3e32ueqm68daochufst.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCf47Oz8uoo3wFXQnktmr54NQmK26MZPg8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "696596299791-alt408dif151f3e32ueqm68daochufst.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "696596299791-84v4221slo0j8kmcsdr3bokobdbcun0s.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pointerTeachers"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:696596299791:android:876100b7d958324d31237a",
         "android_client_info": {
           "package_name": "com.aadi.flutter.pointer_teachers_v2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "696596299791-2ldh6i85dhsc7urb6jtgivl0elubej5o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aadi.flutter.pointer_teachers_v2",
+            "certificate_hash": "4693db9233267b1a9ad294c5522185415f6d398f"
+          }
+        },
+        {
+          "client_id": "696596299791-alt408dif151f3e32ueqm68daochufst.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCf47Oz8uoo3wFXQnktmr54NQmK26MZPg8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "696596299791-alt408dif151f3e32ueqm68daochufst.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "696596299791-84v4221slo0j8kmcsdr3bokobdbcun0s.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pointerTeachers"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:696596299791:android:4c02fcb09a1be68f31237a",
+        "android_client_info": {
+          "package_name": "com.aadi.phone_auth"
         }
       },
       "oauth_client": [
@@ -43,9 +131,9 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:696596299791:android:ba09417d129b21d531237a",
+        "mobilesdk_app_id": "1:696596299791:android:414563481e9a8bfd31237a",
         "android_client_info": {
-          "package_name": "com.aadi.pointer_teachers_2"
+          "package_name": "com.deepak.phone_auth"
         }
       },
       "oauth_client": [

@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
-import 'package:pointer_teachers_v2/Screens/newStudentScreen.dart';
+import 'package:pointer_teachers_v2/Screens/newSubjectStudentScreen.dart';
 import 'package:pointer_teachers_v2/Screens/studentScreen.dart';
 import 'package:pointer_teachers_v2/Storage/StorageStructure/SubjectGroup.dart';
 import 'package:pointer_teachers_v2/Storage/cloudFirestoreControl.dart';
@@ -119,7 +119,7 @@ class _SubjectsState extends State<Subjects> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                NewStudentScreen(
+                                                NewSubjectStudentScreen(
                                                   subjectGroup: widget.clickedSubject,
                                                   schoolID: widget.schoolID,
                                                 )))),

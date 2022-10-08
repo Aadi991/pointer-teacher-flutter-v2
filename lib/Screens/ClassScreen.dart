@@ -4,8 +4,9 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:pointer_teachers_v2/Screens/homeScreen.dart';
-import 'package:pointer_teachers_v2/Screens/newStudentScreen.dart';
-import 'package:pointer_teachers_v2/Screens/signInOrRegisterScreen.dart';
+import 'package:pointer_teachers_v2/Screens/newClassStudentScreen.dart';
+import 'package:pointer_teachers_v2/Screens/newSubjectStudentScreen.dart';
+import 'package:pointer_teachers_v2/Screens/Archive/signInOrRegisterScreen.dart';
 import 'package:pointer_teachers_v2/Screens/studentScreen.dart';
 import 'package:pointer_teachers_v2/Storage/cloudFirestoreControl.dart';
 import 'package:pointer_teachers_v2/Widgets/studentListWidget.dart';
@@ -39,6 +40,15 @@ class _ClassesState extends State<Classes> {
   TextEditingController classSectionController = TextEditingController();
   TextEditingController HRTIDController = TextEditingController();
   CloudFirestoreControl control = CloudFirestoreControl();
+
+
+  _ClassesState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+
+      });
+    });
+  }
 
   @override
   void initState() {
@@ -129,7 +139,7 @@ class _ClassesState extends State<Classes> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                NewStudentScreen(
+                                                NewClassStudentScreen(
                                                   section:
                                                       widget.clickedSection,
                                                   schoolID: widget.schoolID,

@@ -1,15 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_sms/flutter_sms.dart' as SMS;
 
 import 'Storage/SignInOption.dart';
 
 class Utils {
-  /**
-   * Generates a positive random integer uniformly distributed on the range
-   * from [min], inclusive, to [max], exclusive.
-   */
   static int randomRange(int min, int max) =>
       min + new Random().nextInt(max - min);
 
@@ -25,19 +20,13 @@ class Utils {
     }
     return ret;
   }
-
-  static void sendSMS(String message, List<String> recipents) async {
-    String _result = await SMS.sendSMS(message: message, recipients: recipents)
-        .catchError((onError) {
-      print(onError);
-    });
-    print(_result);
-  }
 }
 
 class GlobalVariables{
   static SignInOptions signInOption = SignInOptions.None;
   static ProfileFrom profileFrom = ProfileFrom.None;
+  static bool isDev = false;
+  static bool setPhoneNo = true;
 }
 
 enum ProfileFrom{

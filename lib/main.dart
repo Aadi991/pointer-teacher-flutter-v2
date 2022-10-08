@@ -7,24 +7,22 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
 import 'package:pointer_teachers_v2/Colours.dart';
-import 'package:pointer_teachers_v2/Screens/phoneSignInScreen.dart';
+import 'package:pointer_teachers_v2/Screens/homeScreen.dart';
+import 'package:pointer_teachers_v2/Screens/phoneAuthScreen.dart';
 import 'package:pointer_teachers_v2/Storage/cloudFirestoreControl.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:pointer_teachers_v2/Utils.dart';
 import 'package:pointer_teachers_v2/Colours.dart';
-import 'Screens/forgotPasswordScreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'Screens/Archive/forgotPasswordScreen.dart';
 import 'Screens/profileScreen.dart';
-import 'Screens/signInOrRegisterScreen.dart';
+import 'Screens/Archive/signInOrRegisterScreen.dart';
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  FirebaseFirestore.instance.settings  = Settings(
-    host: "10.0.2.2:8080"
-  );
-  FirebaseAuth.instance.useAuthEmulator("10.0.2.", 9099);
+  await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -55,7 +53,7 @@ class _SplashPageState extends State<SplashPage> {
   CloudFirestoreControl? control;
   String? phoneNumber;
 
-  FirebaseAuth auth = FirebaseAuth.instance;
+  FirebaseAuth? auth = FirebaseAuth.instance;
 
   String random10DigitNumber() {
     String ret = " ";
@@ -96,17 +94,27 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     control = CloudFirestoreControl();
     GlobalVariables.profileFrom = ProfileFrom.SplashPage;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      FirebaseAuth.instance.currentUser != null
-          ? Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => Profile(),
-              ),
-            )
-          : {
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>PhoneSignIn()))
-            };
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String phoneNo = "+919880721381";
+      String schoolID = prefs.getString(SharedPrefsKeys.schoolIDKey) ?? "";
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Home(schoolID:schoolID , phoneNo: phoneNo),
+        ),
+      );
+     /*FirebaseAuth.instance.currentUser != null
+              ? Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Profile(),
+                  ),
+                )
+              : {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => SignIn()))
+                };*/
     });
   }
 }

@@ -68,10 +68,11 @@ class _StudentScreenState extends State<StudentScreen> {
                               Navigator.pop(context);
                             },
                           ),
-                          TextButton(onPressed: (){
-                            Navigator.pop(context);
-
-                          }, child: Text("Take me back"))
+                          TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text("Take me back"))
                         ],
                       ));
             },
@@ -100,7 +101,8 @@ class _StudentScreenState extends State<StudentScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => EditStudentScreen(
-                              currentStudent: clickedStudent,schoolID: clickedStudent.schoolID!,
+                              currentStudent: clickedStudent,
+                              schoolID: clickedStudent.schoolID!,
                             )));
               }
             }, itemBuilder: (BuildContext context) {
@@ -156,7 +158,7 @@ class _StudentScreenState extends State<StudentScreen> {
                                       SizedBox(
                                         width: 10,
                                       ),
-                                      Image.asset("images/student.png",
+                                      Image.asset(widget.clickedStudent.isBoy!?'images/boy.png':'images/girl.png',
                                           height: imageSize.toDouble(),
                                           width: imageSize.toDouble()),
                                       SizedBox(
@@ -362,8 +364,34 @@ class _StudentScreenState extends State<StudentScreen> {
                                             });
                                           },
                                           onLongPress: () {
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AlertDialog(
+                                                    title: Text("Warning"),
+                                                    content: Text(
+                                                        "Are you sure you want to delete this"),
+                                                    actions: [
+                                                      TextButton(
+                                                          onPressed: () {
+                                                            control.deleteDocRef(
+                                                                "Schools/${widget.clickedStudent.schoolID}/Students/${widget.clickedStudent.fullName}/Actions/${rewards[index].reason}");
+                                                            print("Schools/${widget.clickedStudent.schoolID}/Students/${widget.clickedStudent.fullName}/Actions/${rewards[index].reason}");
+                                                            rewards.removeAt(index);
+                                                            Navigator.pop(context);
+                                                          },
+                                                          child: Text("Yes")),
+                                                      TextButton(
+                                                          onPressed: () {
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
+                                                          child: Text("No"))
+                                                    ],
+                                                  );
+                                                });
                                             setState(() {
-                                              rewards.removeAt(index);
+                                              print(index);
                                             });
                                           },
                                           child: Container(
@@ -516,6 +544,7 @@ class _StudentScreenState extends State<StudentScreen> {
                                                             .clear();
                                                         pointsController
                                                             .clear();
+                                                        setState(() {});
                                                       },
                                                     )
                                                   ],
@@ -536,9 +565,36 @@ class _StudentScreenState extends State<StudentScreen> {
                                         });
                                       },
                                       onLongPress: () {
-                                        setState(() {
-                                          penalties.removeAt(index);
-                                        });
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                title: Text("Warning"),
+                                                content: Text(
+                                                    "Are you sure you want to delete this"),
+                                                actions: [
+                                                  TextButton(
+                                                      onPressed: () {
+                                                        control.deleteDocRef(
+                                                            "Schools/${widget.clickedStudent.schoolID}/Students/${widget.clickedStudent.fullName}/Actions/${penalties[index].reason}");
+                                                        print(
+                                                            "Schools/${widget.clickedStudent.schoolID}/Students/${widget.clickedStudent.fullName}/Actions/${penalties[index].reason}");
+
+                                                        ///Schools/Candor/Students/Ananya Lekshmi Nair/Actions/bad girl
+                                                        penalties
+                                                            .removeAt(index);
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text("Yes")),
+                                                  TextButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text("No"))
+                                                ],
+                                              );
+                                            });
+                                        setState(() {});
                                       },
                                       child: Container(
                                         decoration: BoxDecoration(

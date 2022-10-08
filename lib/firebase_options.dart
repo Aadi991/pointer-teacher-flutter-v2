@@ -63,7 +63,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '696596299791',
     projectId: 'pointer-teachers',
     storageBucket: 'pointer-teachers.appspot.com',
-    androidClientId: '696596299791-gf2chl6vh4fivhdqfl38s5tulru52ot3.apps.googleusercontent.com',
+    androidClientId: '696596299791-2ldh6i85dhsc7urb6jtgivl0elubej5o.apps.googleusercontent.com',
     iosClientId: '696596299791-jbfkj6u1htchameoq5qe5a4bk9be19qm.apps.googleusercontent.com',
     iosBundleId: 'com.aadi.flutter.pointerTeachersV2',
   );

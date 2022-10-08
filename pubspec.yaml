@@ -24,7 +24,6 @@ dependencies:
   flutterfire_ui: ^0.4.2+2
   firebase_auth: ^3.4.1
   google_sign_in: ^5.4.0
-  flutter_sms: ^2.3.3
 
 dev_dependencies:
   flutter_test:

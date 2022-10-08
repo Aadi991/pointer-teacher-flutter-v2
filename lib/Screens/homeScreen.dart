@@ -210,8 +210,9 @@ class _HomeState extends State<Home> {
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:pointer_teachers_v2/Screens/phoneAuthScreen.dart';
 import 'package:pointer_teachers_v2/Screens/profileScreen.dart';
-import 'package:pointer_teachers_v2/Screens/signInOrRegisterScreen.dart';
+import 'package:pointer_teachers_v2/Screens/Archive/signInOrRegisterScreen.dart';
 import 'package:pointer_teachers_v2/Screens/subjectGroupScreen.dart';
 import 'package:pointer_teachers_v2/Storage/StorageStructure/GradeList.dart';
 import 'package:pointer_teachers_v2/Storage/StorageStructure/SectionList.dart';
@@ -444,7 +445,7 @@ class _HomeState extends State<Home> {
                                                           context,
                                                           MaterialPageRoute(
                                                               builder: (context) =>
-                                                                  SignInOrRegister()));
+                                                                  SignIn()));
                                                       return;
                                                     }
                                                     if (classGradeController
@@ -810,7 +811,7 @@ class _HomeState extends State<Home> {
                 ]),
               );
             } else if (snapshot.hasError) {
-              print("line 809 ${snapshot.error}");
+              print("line 8134 ${snapshot.error}");
               return Center(
                 child: Column(
                   children: [

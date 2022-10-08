@@ -40,7 +40,7 @@ class _StudentListWidgetState extends State<StudentListWidget> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Image.asset(
-              'images/student.png',
+              widget.clickedStudent.isBoy!?'images/boy.png':'images/girl.png',
               height: 120,
               width: 120,
             ),

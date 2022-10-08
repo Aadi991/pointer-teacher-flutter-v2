@@ -8,22 +8,24 @@ import 'package:pointer_teachers_v2/Storage/StorageStructure/SubjectGroup.dart';
 import 'package:pointer_teachers_v2/Storage/cloudFirestoreControl.dart';
 
 import '../Storage/StorageStructure/Section.dart';
+import '../Storage/StorageStructure/StudentList.dart';
 import '../Utils.dart';
 
-class NewStudentScreen extends StatefulWidget {
-  Section? section;
-  SubjectGroup? subjectGroup;
+class NewClassStudentScreen extends StatefulWidget {
+  Section section;
   String schoolID;
 
-  NewStudentScreen(
-      {Key? key, this.section, this.subjectGroup, required this.schoolID})
+  NewClassStudentScreen(
+      {Key? key, required this.section, required this.schoolID})
       : super(key: key);
 
   @override
-  State<NewStudentScreen> createState() => _NewStudentScreenState();
+  State<NewClassStudentScreen> createState() => _NewClassStudentScreenState(section,schoolID);
 }
 
-class _NewStudentScreenState extends State<NewStudentScreen> {
+class _NewClassStudentScreenState extends State<NewClassStudentScreen> {
+  Section section;
+  String schoolID;
   TextEditingController _fullNameController = TextEditingController();
   TextEditingController _screenNameController = TextEditingController();
   TextEditingController _phoneNoController = TextEditingController();
@@ -35,7 +37,17 @@ class _NewStudentScreenState extends State<NewStudentScreen> {
   CloudFirestoreControl control = CloudFirestoreControl();
   bool loading = false;
 
+
+  _NewClassStudentScreenState(this.section, this.schoolID);
+
   String gender = "";
+
+
+  @override
+  void initState() {
+    _gradeController.text = section.classGrade.toString();
+    _sectionController.text = section.classSection!;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -163,6 +175,7 @@ class _NewStudentScreenState extends State<NewStudentScreen> {
                                 groupValue: gender,
                                 onChanged: (String? value) {
                                   setState(() {
+                                    print(gender);
                                     gender = value!;
                                   });
                                 },
@@ -222,35 +235,34 @@ class _NewStudentScreenState extends State<NewStudentScreen> {
                                     0,
                                     widget.schoolID,
                                     "",
-                                    gender == "boy" ? true : false,
+                                    gender == "Boy" ? true : false,
                                     StudentRank.None),
                               );
-                              if (widget.section != null) {
-                                control.setSectionStudent(
-                                    Student.withOutLists(
-                                        _fullNameController.text.trim(),
-                                        _screenNameController.text.trim(),
-                                        _phoneNoController.text.trim(),
-                                        int.parse(_ageController.text.trim()),
-                                        _teachersIDController.text.trim(),
-                                        _parentsIDController.text.trim(),
-                                        widget.schoolID,
-                                        ChildRank.None,
-                                        int.parse(_gradeController.text.trim()),
-                                        _sectionController.text.trim(),
-                                        0,
-                                        0,
-                                        widget.schoolID,
-                                        "",
-                                        gender == "boy" ? true : false,
-                                        StudentRank.None),
-                                    widget.section!.classSection.toString());
-                              }else if(widget.subjectGroup!=null){
 
-                              }
+                              control.setSectionStudent(
+                                  Student.withOutLists(
+                                      _fullNameController.text.trim(),
+                                      _screenNameController.text.trim(),
+                                      _phoneNoController.text.trim(),
+                                      int.parse(_ageController.text.trim()),
+                                      _teachersIDController.text.trim(),
+                                      _parentsIDController.text.trim(),
+                                      widget.schoolID,
+                                      ChildRank.None,
+                                      int.parse(_gradeController.text.trim()),
+                                      _sectionController.text.trim(),
+                                      0,
+                                      0,
+                                      widget.schoolID,
+                                      "",
+                                      gender == "Boy" ? true : false,
+                                      StudentRank.None),
+                                  widget.section.classSection.toString());
+
+                              Navigator.pop(context);
                             }
-                            Navigator.pop(context);
-                          },
+
+                            },
                           child: Text("Submit"))
                     ],
                   ),

@@ -7,7 +7,7 @@ import 'package:pointer_teachers_v2/Storage/SignInOption.dart';
 import 'package:pointer_teachers_v2/Utils.dart';
 
 import '../Colours.dart';
-import '../Screens/forgotPasswordScreen.dart';
+import '../Screens/Archive/forgotPasswordScreen.dart';
 import '../Screens/profileScreen.dart';
 
 class SignInWidget extends StatefulWidget {

@@ -9,6 +9,7 @@ import 'package:pointer_teachers_v2/Storage/StorageStructure/Student.dart';
 import 'package:pointer_teachers_v2/Storage/StorageStructure/StudentList.dart';
 import 'package:pointer_teachers_v2/Storage/StorageStructure/SubjectGroup.dart';
 import 'package:pointer_teachers_v2/Storage/StorageStructure/SubjectGroupList.dart';
+import 'package:pointer_teachers_v2/Utils.dart';
 import 'StorageStructure/Action.dart';
 import 'StorageStructure/ActionList.dart';
 import 'StorageStructure/Grade.dart';
@@ -20,7 +21,7 @@ import 'StorageStructure/Teacher.dart';
 import 'StorageStructure/TeachersList.dart';
 
 class CloudFirestoreControl {
-  FirebaseFirestore db = FirebaseFirestore.instance;
+  FirebaseFirestore db =FirebaseFirestore.instance;
 
   //region Keys
   static const String keyFullName = "Full Name";
@@ -110,6 +111,7 @@ class CloudFirestoreControl {
 
   void updateSchool(String schoolID, School original,
       {SchoolBoard? schoolBoard, String? schoolName}) {
+    if(db == null)
     if (schoolID == original.schoolID)
       db.collection("Schools").doc(schoolID).update(
           School.withOutLists(schoolBoard, schoolName, schoolID).toFirestore());
@@ -665,7 +667,7 @@ class CloudFirestoreControl {
     }
   }
 
-  getSubjectGroupStudentsList(
+  Future<StudentList?> getSubjectGroupStudentsList(
       String schoolID, int grade, String subject) async {
     CollectionReference _collectionRef = db
         .collection("Schools")

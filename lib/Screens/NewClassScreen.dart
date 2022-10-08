@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:pointer_teachers_v2/Screens/signInOrRegisterScreen.dart';
+import 'package:pointer_teachers_v2/Screens/Archive/signInOrRegisterScreen.dart';
 import 'package:pointer_teachers_v2/Storage/cloudFirestoreControl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
