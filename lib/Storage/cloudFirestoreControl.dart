@@ -21,7 +21,7 @@ import 'StorageStructure/Teacher.dart';
 import 'StorageStructure/TeachersList.dart';
 
 class CloudFirestoreControl {
-  FirebaseFirestore db =FirebaseFirestore.instance;
+  FirebaseFirestore db = FirebaseFirestore.instance;
 
   //region Keys
   static const String keyFullName = "Full Name";
@@ -111,8 +111,7 @@ class CloudFirestoreControl {
 
   void updateSchool(String schoolID, School original,
       {SchoolBoard? schoolBoard, String? schoolName}) {
-    if(db == null)
-    if (schoolID == original.schoolID)
+    if (db == null) if (schoolID == original.schoolID)
       db.collection("Schools").doc(schoolID).update(
           School.withOutLists(schoolBoard, schoolName, schoolID).toFirestore());
     else {
@@ -177,7 +176,7 @@ class CloudFirestoreControl {
             fromFirestore: Student.fromFirestore,
             toFirestore: (student, _) => student.toFirestore())
         .set(toSave);
-    if (toSave.actionList != null) {
+    if (toSave.actionList != null || toSave.actionList!.actionList!.isNotEmpty) {
       ActionList actions = toSave.actionList as ActionList;
       setActionList(
           actions, toSave.schoolID.toString(), toSave.fullName.toString());
@@ -682,7 +681,7 @@ class CloudFirestoreControl {
     final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
     for (final e in allData) {
       Map<String, dynamic> data = e as Map<String, dynamic>;
-      list.studentList.add(Student.fromMap(data));
+      list.studentList.add((await getStudentWithRef(data[keyStudentRef]))!);
     }
     return list;
   }
@@ -697,7 +696,9 @@ class CloudFirestoreControl {
         .doc(subject)
         .collection("Students")
         .doc(toSave.fullName)
-        .set(toSave.toFirestore());
+        .set({
+      keyStudentRef: "/Schools/${toSave.schoolID}/Students/${toSave.fullName}",
+    });
   }
 
   setSectionStudentsList(StudentList students, String section) {

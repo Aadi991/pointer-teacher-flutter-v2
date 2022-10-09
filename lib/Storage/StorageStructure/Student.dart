@@ -16,10 +16,10 @@ import 'TeachersList.dart';
 class Student {
   String? fullName, screenName, phoneNo;
   int? age;
-  TeachersList? teachersList = new TeachersList.empty();
-  ActionList? actionList = new ActionList.empty();
-  ParentsList? parentsList = new ParentsList.empty();
-  HistoryList? historyList = new HistoryList.empty();
+  TeachersList? teachersList = TeachersList.empty();
+  ActionList? actionList = ActionList.empty();
+  ParentsList? parentsList = ParentsList.empty();
+  HistoryList? historyList = HistoryList.empty();
   String? teachersID, parentsID, schoolID;
   ChildRank? rank;
   int? HomePoints, schoolPoints, grade;

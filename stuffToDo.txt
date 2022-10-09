@@ -1,0 +1,11 @@
+//1
+auto use phonenumber from sign in
+fix sign in
+implement history (copy from parents app)
+remember an existing users data
+
+//2
+chat ui to get teacher and student data
+
+//3
+backend system to bulk add students

@@ -162,6 +162,7 @@ class _NewClassStudentScreenState extends State<NewClassStudentScreen> {
                                 onChanged: (String? value) {
                                   setState(() {
                                     gender = value!;
+                                    print(gender);
                                   });
                                 },
                               ),
@@ -175,8 +176,8 @@ class _NewClassStudentScreenState extends State<NewClassStudentScreen> {
                                 groupValue: gender,
                                 onChanged: (String? value) {
                                   setState(() {
-                                    print(gender);
                                     gender = value!;
+                                    print(gender);
                                   });
                                 },
                               ),
